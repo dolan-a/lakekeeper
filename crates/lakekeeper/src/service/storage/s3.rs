@@ -4,6 +4,7 @@ use std::{collections::HashMap, str::FromStr, sync::LazyLock};
 
 use aws_config::{identity::IdentityCache, BehaviorVersion, SdkConfig};
 use aws_sdk_sts::config::{ProvideCredentials as _, SharedIdentityCache};
+use aws_sdk_sts::types::Tag;
 use iceberg_ext::configs::{
     table::{client, custom, s3, TableProperties},
     ConfigProperty, Location,
@@ -748,9 +749,13 @@ impl S3Profile {
         };
 
         let tags = vec![
-            Tag::builder().key("tenant").value("tenant-a").build(),
+            Tag::builder()
+                .key("tenant")
+                .value("tenant-a")
+                .build()
+                .expect("Failed to build STS tag"),
         ];
-        assume_role_builder = assume_role_builder.set_tags(tags);
+        let assume_role_builder = assume_role_builder.set_tags(Some(tags));
 
 
         let v = assume_role_builder.send().await.map_err(|e| {
