@@ -13,6 +13,7 @@ env:
 permissions:
   # contents: write      # Needed for creating releases and uploading assets
   # pull-requests: write # Needed for release-please to create/update PRs
+  contents: read
   packages: write
 
 jobs:
@@ -142,5 +143,8 @@ jobs:
       - name: Push docker
         run: |
           COMMIT_SHA=${GITHUB_SHA::8}  # Get the first 8 characters of the commit SHA
-          docker tag localhost/lakekeeper-local:amd64 ghcr.io/dolan-a/lakekeeper/lakekeeper:${COMMIT_SHA}-amd64
-          docker push ghcr.io/dolan-a/lakekeeper/lakekeeper:${COMMIT_SHA}-amd64
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
+          docker tag localhost/lakekeeper-local:amd64 ghcr.io/${REPO_LOWER}:${COMMIT_SHA}-amd64
+
+          docker push ghcr.io/${REPO_LOWER}:${COMMIT_SHA}-amd64
