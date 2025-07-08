@@ -747,6 +747,12 @@ impl S3Profile {
             assume_role_builder
         };
 
+        let tags = vec![
+            Tag::builder().key("tenant").value("tenant-a").build(),
+        ];
+        assume_role_builder = assume_role_builder.set_tags(tags);
+
+
         let v = assume_role_builder.send().await.map_err(|e| {
             let err_str = format!("{e:?}");
             tracing::warn!("Failed to assume role via STS: {err_str}");
